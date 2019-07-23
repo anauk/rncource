@@ -1,113 +1,65 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
+import React, {Component} from 'react';
+import {StyleSheet, View} from 'react-native';
+import {connect} from 'react-redux';
 
-import React, {Fragment} from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
+import PlaceInput from "./src/components/PlaceInput/PlaceList";
+import PlaceList from "./src/components/PlaceList/PlaceList";
+import imagePlace from "./src/assets/rat.jpg";
+import PlaceDetail from "./src/components/PlaceDetail/PlaceDetail";
+import {addPlace, deletePlace, selectPlace, deselectPlace} from './src/store/actions/index'
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+class App extends Component {
+  placeAddedHandler = placeName => {
+    this.props.onAddPlace(placeName);
+  }
+  placeSelectedHandler = key => {
+    this.props.onSelectPlace(key);
+  }
+  placeDeletedHandler = () => {
+    this.props.onDeletePlace();
+  }
+  placeClosedHandler = () => {
+    this.props.onDeselectPlace();
+  }
 
-const App = () => {
-  return (
-    <Fragment>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Hi</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> bla bla
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </Fragment>
-  );
-};
+  render() {
+    return (
+      <View style={styles.container}>
+        <PlaceDetail selectedPlace={this.props.selectedPlace}
+                     onItemDeleted={this.placeDeletedHandler}
+                     onModalClosed={this.placeClosedHandler}/>
+        <PlaceInput onPlaceAdded={this.placeAddedHandler}/>
+        <PlaceList
+          places={this.props.places}
+          onItemSelected={this.placeSelectedHandler}
+        />
+      </View>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
+  container: {
+    flex: 1,
+    padding: 40,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  }
 });
+const mapStateToProps = state => {
+  return {
+    places: state.places.places,
+    selectedPlace: state.places.selectedPlace
+  };
+};
 
-export default App;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onAddPlace: name => dispatch(addPlace(name)),
+    onDeletePlace: () => dispatch(deletePlace()),
+    onSelectPlace: key => dispatch(selectPlace(key)),
+    onDeselectPlace: () => dispatch(deselectPlace())
+  }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(App);
