@@ -189,7 +189,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation "com.facebook.react:react-native:+"  // From node_modules
+    implementation "com.facebook.react:react-native:0.60.0"  // From node_modules
+    compile project(':react-native-vector-icons')
 
     if (enableHermes) {
       def hermesPath = "../../node_modules/hermesvm/android/";
@@ -207,4 +208,10 @@ task copyDownloadableDepsToLibs(type: Copy) {
     into 'libs'
 }
 
+//apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+project.ext.vectoricons = [
+        iconFontNames: [ 'Ionicons.ttf' ] // Name of the font files you want to copy
+]
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
